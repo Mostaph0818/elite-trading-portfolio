@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#DC2626"/>
+      <stop offset="50%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#DC2626"/>
+    </linearGradient>
+  </defs>
+  <rect x="10" y="10" width="180" height="180" rx="36" fill="#0A0A0A" stroke="url(#g)" stroke-width="4"/>
+  <rect x="16" y="16" width="168" height="168" rx="30" fill="none" stroke="url(#g)" stroke-width="1" opacity="0.3"/>
+  <text x="100" y="108" font-family="Arial,sans-serif" font-size="56" font-weight="900" text-anchor="middle" fill="url(#g)">PT</text>
+  <text x="100" y="140" font-family="Arial,sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="#A3A3A3" letter-spacing="6">ELITE</text>
+</svg>
