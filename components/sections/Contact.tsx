@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { SITE, SERVICES } from "@/lib/constants";
+import { SITE, SERVICES, IMAGES } from "@/lib/constants";
 import Button from "@/components/ui/Button";
 
 const borderCls = (i: number) =>
@@ -19,7 +19,7 @@ export default function Contact() {
     <section id="contact" className="section-padding relative">
       <div className="absolute inset-0">
         <img
-          src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1400&q=60"
+          src={IMAGES.contactBg}
           alt=""
           className="absolute inset-0 w-full h-full object-cover opacity-10"
         />

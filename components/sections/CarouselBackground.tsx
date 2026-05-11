@@ -3,20 +3,10 @@
 import { useRef, useMemo, Suspense } from "react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
-
-const IMAGES = [
-  "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=300&h=225&fit=crop&auto=format",
-  "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=300&h=225&fit=crop&auto=format",
-  "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=300&h=225&fit=crop&auto=format",
-  "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=300&h=225&fit=crop&auto=format",
-  "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=300&h=225&fit=crop&auto=format",
-  "https://images.unsplash.com/photo-1557838923-2985c318be48?w=300&h=225&fit=crop&auto=format",
-  "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=300&h=225&fit=crop&auto=format",
-  "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=300&h=225&fit=crop&auto=format",
-];
+import { IMAGES } from "@/lib/constants";
 
 const RADIUS = 4.5;
-const COUNT = IMAGES.length;
+const COUNT = IMAGES.carousel.length;
 
 function Card({ url, index }: { url: string; index: number }) {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -60,7 +50,7 @@ function Carousel() {
 
   return (
     <group ref={ref} position={[0, 0.5, 0]}>
-      {IMAGES.map((url, i) => (
+      {IMAGES.carousel.map((url, i) => (
         <Card key={i} url={url} index={i} />
       ))}
     </group>

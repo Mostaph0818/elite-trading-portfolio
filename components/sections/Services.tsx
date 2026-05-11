@@ -2,16 +2,9 @@
 
 import { useState } from "react";
 import { motion } from "motion/react";
-import { SERVICES } from "@/lib/constants";
+import { SERVICES, IMAGES } from "@/lib/constants";
 import Card from "@/components/ui/Card";
 import ServiceDetail from "./ServiceDetail";
-
-const bgImages = [
-  "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&q=60",
-  "https://images.unsplash.com/photo-1504711434969-e33886168d5c?w=400&q=60",
-  "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&q=60",
-  "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&q=60",
-];
 
 export default function Services() {
   const [selected, setSelected] = useState<string | null>(null);
@@ -67,7 +60,7 @@ export default function Services() {
               >
                 <div className="absolute inset-0 opacity-20">
                   <img
-                    src={bgImages[index]}
+                    src={IMAGES.serviceBgs[index]}
                     alt=""
                     className="absolute inset-0 w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
                   />

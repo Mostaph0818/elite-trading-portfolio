@@ -1,0 +1,73 @@
+backend:
+  name: git-gateway
+  branch: master
+
+media_folder: public/images
+public_folder: /images
+
+locale: ar
+
+collections:
+  - name: "site"
+    label: "الموقع"
+    format: "json"
+    files:
+      - name: "general"
+        label: "معلومات الموقع"
+        file: "content/site.json"
+        fields:
+          - { name: "name", label: "اسم الموقع", widget: "string" }
+          - { name: "tagline", label: "الشعار", widget: "string" }
+          - { name: "subtitle", label: "العنوان الفرعي", widget: "string" }
+          - { name: "description", label: "الوصف", widget: "text" }
+          - { name: "instagram", label: "رابط إنستغرام", widget: "string" }
+          - { name: "tiktok", label: "رابط تيك توك", widget: "string" }
+          - { name: "telegram", label: "رابط تلغرام", widget: "string" }
+          - { name: "courseHub", label: "رابط منصة الدورات", widget: "string" }
+          - { name: "email", label: "البريد الإلكتروني", widget: "string" }
+
+  - name: "services"
+    label: "الخدمات"
+    format: "json"
+    file: "content/services.json"
+    fields:
+      - name: "items"
+        label: "قائمة الخدمات"
+        widget: "list"
+        fields:
+          - { name: "id", label: "المعرف", widget: "string" }
+          - { name: "title", label: "العنوان", widget: "string" }
+          - { name: "subtitle", label: "العنوان الفرعي", widget: "string" }
+          - { name: "icon", label: "الأيقونة", widget: "string" }
+          - { name: "platforms", label: "المنصات", widget: "list" }
+          - { name: "features", label: "المميزات", widget: "list" }
+          - { name: "cta", label: "نص الزر", widget: "string" }
+          - { name: "link", label: "الرابط (اختياري)", widget: "string", required: false }
+
+  - name: "stats"
+    label: "الإحصائيات"
+    format: "json"
+    file: "content/stats.json"
+    fields:
+      - name: "items"
+        label: "قائمة الإحصائيات"
+        widget: "list"
+        fields:
+          - { name: "label", label: "النص", widget: "string" }
+          - { name: "value", label: "القيمة", widget: "string" }
+
+  - name: "images"
+    label: "الصور"
+    format: "json"
+    file: "content/images.json"
+    fields:
+      - { name: "logo", label: "رابط الشعار", widget: "string" }
+      - { name: "contactBg", label: "خلفية قسم التواصل", widget: "string" }
+      - name: "serviceBgs"
+        label: "خلفيات الخدمات"
+        widget: "list"
+        field: { label: "رابط الصورة", name: "url", widget: "string" }
+      - name: "carousel"
+        label: "صور الكاروسيل"
+        widget: "list"
+        field: { label: "رابط الصورة", name: "url", widget: "string" }
