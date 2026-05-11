@@ -29,45 +29,54 @@ collections:
   - name: "services"
     label: "الخدمات"
     format: "json"
-    file: "content/services.json"
-    fields:
-      - name: "items"
+    files:
+      - name: "services"
         label: "قائمة الخدمات"
-        widget: "list"
+        file: "content/services.json"
         fields:
-          - { name: "id", label: "المعرف", widget: "string" }
-          - { name: "title", label: "العنوان", widget: "string" }
-          - { name: "subtitle", label: "العنوان الفرعي", widget: "string" }
-          - { name: "icon", label: "الأيقونة", widget: "string" }
-          - { name: "platforms", label: "المنصات", widget: "list" }
-          - { name: "features", label: "المميزات", widget: "list" }
-          - { name: "cta", label: "نص الزر", widget: "string" }
-          - { name: "link", label: "الرابط (اختياري)", widget: "string", required: false }
+          - name: "items"
+            label: "الخدمات"
+            widget: "list"
+            fields:
+              - { name: "id", label: "المعرف", widget: "string" }
+              - { name: "title", label: "العنوان", widget: "string" }
+              - { name: "subtitle", label: "العنوان الفرعي", widget: "string" }
+              - { name: "icon", label: "الأيقونة", widget: "string" }
+              - { name: "platforms", label: "المنصات", widget: "list" }
+              - { name: "features", label: "المميزات", widget: "list" }
+              - { name: "cta", label: "نص الزر", widget: "string" }
+              - { name: "link", label: "الرابط (اختياري)", widget: "string", required: false }
 
   - name: "stats"
     label: "الإحصائيات"
     format: "json"
-    file: "content/stats.json"
-    fields:
-      - name: "items"
-        label: "قائمة الإحصائيات"
-        widget: "list"
+    files:
+      - name: "stats"
+        label: "الإحصائيات"
+        file: "content/stats.json"
         fields:
-          - { name: "label", label: "النص", widget: "string" }
-          - { name: "value", label: "القيمة", widget: "string" }
+          - name: "items"
+            label: "قائمة الإحصائيات"
+            widget: "list"
+            fields:
+              - { name: "label", label: "النص", widget: "string" }
+              - { name: "value", label: "القيمة", widget: "string" }
 
   - name: "images"
     label: "الصور"
     format: "json"
-    file: "content/images.json"
-    fields:
-      - { name: "logo", label: "رابط الشعار", widget: "string" }
-      - { name: "contactBg", label: "خلفية قسم التواصل", widget: "string" }
-      - name: "serviceBgs"
-        label: "خلفيات الخدمات"
-        widget: "list"
-        field: { label: "رابط الصورة", name: "url", widget: "string" }
-      - name: "carousel"
-        label: "صور الكاروسيل"
-        widget: "list"
-        field: { label: "رابط الصورة", name: "url", widget: "string" }
+    files:
+      - name: "images"
+        label: "الصور"
+        file: "content/images.json"
+        fields:
+          - { name: "logo", label: "الشعار", widget: "string" }
+          - { name: "contactBg", label: "خلفية قسم التواصل", widget: "string" }
+          - name: "serviceBgs"
+            label: "خلفيات الخدمات"
+            widget: "list"
+            field: { label: "الرابط", name: "url", widget: "string" }
+          - name: "carousel"
+            label: "صور الكاروسيل"
+            widget: "list"
+            field: { label: "الرابط", name: "url", widget: "string" }
