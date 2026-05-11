@@ -1,21 +1,291 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>لوحة التحكم - PIT TRADING ELITE</title>
-  <style>
-    body { font-family: system-ui, sans-serif; background: #050505; color: #fff; margin: 0; }
-    header { text-align: center; padding: 2rem; }
-    header h1 { color: #dc2626; font-size: 1.5rem; margin: 0; }
-    header p { color: #888; font-size: 0.9rem; margin: 0.5rem 0 0; }
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>لوحة التحكم - PIT TRADING ELITE</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;background:#050505;color:#fff;min-height:100vh}
+header{background:#0a0a0a;border-bottom:1px solid #1a1a1a;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center}
+header h1{color:#dc2626;font-size:1.3rem}
+header span{color:#666;font-size:.85rem}
+.container{max-width:800px;margin:0 auto;padding:2rem}
+.card{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+.card h3{color:#dc2626;margin-bottom:.5rem;font-size:1rem}
+label{display:block;color:#aaa;font-size:.85rem;margin-bottom:.3rem;margin-top:.8rem}
+label:first-child{margin-top:0}
+input,textarea,select{width:100%;padding:.7rem;background:#111;border:1px solid #222;border-radius:8px;color:#fff;font-size:.9rem;font-family:system-ui}
+textarea{min-height:80px;resize:vertical}
+input:focus,textarea:focus{outline:none;border-color:#dc2626}
+.btn{padding:.7rem 1.5rem;border:none;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600}
+.btn-primary{background:#dc2626;color:#fff}
+.btn-primary:hover{background:#b91c1c}
+.btn-secondary{background:#222;color:#fff}
+.btn-secondary:hover{background:#333}
+.btn-green{background:#10b981;color:#fff}
+.btn-green:hover{background:#059669}
+.msg{padding:.8rem;border-radius:8px;margin-bottom:1rem;display:none}
+.msg.success{background:#065f46;color:#6ee7b7;display:block}
+.msg.error{background:#7f1d1d;color:#fca5a5;display:block}
+.tabs{display:flex;gap:.5rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.tab{padding:.5rem 1rem;background:#111;border:1px solid #222;border-radius:8px;cursor:pointer;color:#888;font-size:.85rem}
+.tab.active{background:#1a1a1a;border-color:#dc2626;color:#dc2626}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.flex{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.mt-1{margin-top:1rem}
+.mb-1{margin-bottom:1rem}
+.gap-1{gap:1rem}
+.text-center{text-align:center}
+.token-input{display:flex;gap:.5rem}
+.token-input input{flex:1}
+.hidden{display:none}
+@media(max-width:600px){header{flex-direction:column;gap:.5rem;text-align:center}.container{padding:1rem}}
+</style>
 </head>
 <body>
-  <header>
-    <h1>PIT TRADING ELITE</h1>
-    <p>لوحة التحكم</p>
-  </header>
-  <script src="https://unpkg.com/decap-cms@^3/dist/decap-cms.js"></script>
+
+<header>
+<div><h1>PIT TRADING ELITE</h1><span>لوحة التحكم</span></div>
+<div class="flex">
+  <a href="/" target="_blank" style="color:#666;font-size:.85rem">← الموقع</a>
+  <button class="btn btn-secondary" onclick="logout()" style="padding:.3rem .8rem;font-size:.8rem">تسجيل خروج</button>
+</div>
+</header>
+
+<div class="container" id="loginScreen">
+<div class="card" style="max-width:450px;margin:3rem auto">
+<h3 style="color:#dc2626;margin-bottom:1rem">تسجيل الدخول</h3>
+<label>GitHub Personal Access Token</label>
+<div class="token-input">
+<input type="password" id="tokenInput" placeholder="ghp_..."/>
+<button class="btn btn-primary" onclick="login()">دخول</button>
+</div>
+<p style="color:#555;font-size:.75rem;margin-top:.8rem">
+أنشئ توكن من <a href="https://github.com/settings/tokens" target="_blank" style="color:#dc2626">GitHub Settings → Tokens</a>
+<br/>اختار صلاحية <strong>repo</strong> (الصلاحيات كاملة)
+</p>
+</div>
+</div>
+
+<div class="container hidden" id="adminScreen">
+
+<div class="tabs" id="tabs"></div>
+<div id="msg" class="msg"></div>
+<div id="tabContent"></div>
+
+<p class="text-center mt-1">
+<button class="btn btn-green" onclick="saveAll()">💾 حفظ كل التعديلات</button>
+</p>
+</div>
+
+<script>
+const REPO = "Mostaph0818/elite-trading-portfolio";
+const BRANCH = "master";
+const FILES = {
+  "site.json": "content/site.json",
+  "services.json": "content/services.json",
+  "stats.json": "content/stats.json",
+  "images.json": "content/images.json",
+};
+
+let token = localStorage.getItem("gh_token");
+let fileData = {};
+let shaMap = {};
+
+function login() { const t = document.getElementById("tokenInput").value.trim(); if (t) { localStorage.setItem("gh_token", t); token = t; loadAdmin(); } }
+function logout() { localStorage.removeItem("gh_token"); token = null; showLogin(); }
+function showLogin() { document.getElementById("loginScreen").classList.remove("hidden"); document.getElementById("adminScreen").classList.add("hidden"); }
+function showAdmin() { document.getElementById("loginScreen").classList.add("hidden"); document.getElementById("adminScreen").classList.remove("hidden"); }
+
+function msg(text, type) {
+  const el = document.getElementById("msg");
+  el.textContent = text;
+  el.className = "msg " + type;
+}
+
+async function ghFetch(path, opts = {}) {
+  const res = await fetch(`https://api.github.com/repos/${REPO}/${path}`, {
+    ...opts,
+    headers: { Authorization: `token ${token}`, ...(opts.headers || {}) },
+  });
+  if (res.status === 401) { msg("⚠️ التوكن غير صالح. سجل دخول مرة أخرى", "error"); setTimeout(logout, 2000); return null; }
+  if (res.status === 403) { const data = await res.json(); msg(`⚠️ ${data.message || "ممنوع الوصول"}`, "error"); return null; }
+  return res;
+}
+
+async function fetchFile(filePath) {
+  const res = await ghFetch(`contents/${encodeURIComponent(filePath)}`);
+  if (!res || !res.ok) return null;
+  const data = await res.json();
+  shaMap[filePath] = data.sha;
+  return JSON.parse(atob(data.content));
+}
+
+async function init() {
+  if (token) loadAdmin();
+}
+
+async function loadAdmin() {
+  showAdmin();
+  msg("جاري تحميل البيانات...", "success");
+  
+  for (const [name, path] of Object.entries(FILES)) {
+    const data = await fetchFile(path);
+    if (data) fileData[name] = data;
+  }
+  
+  renderTabs();
+  renderTab(Object.keys(FILES)[0]);
+  msg("✅ تم التحميل. عدّل المحتوى ثم إضغط حفظ", "success");
+}
+
+function renderTabs() {
+  const tabs = document.getElementById("tabs");
+  tabs.innerHTML = Object.keys(FILES).map((name, i) => 
+    `<div class="tab ${i === 0 ? 'active' : ''}" onclick="switchTab('${name}',this)">${label(name)}</div>`
+  ).join("");
+}
+
+function label(name) {
+  const map = { "site.json": "الموقع", "services.json": "الخدمات", "stats.json": "الإحصائيات", "images.json": "الصور" };
+  return map[name] || name;
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  el.classList.add("active");
+  renderTab(name);
+}
+
+function renderTab(name) {
+  const data = fileData[name];
+  if (!data) return;
+  
+  const container = document.getElementById("tabContent");
+  
+  if (name === "site.json") {
+    container.innerHTML = siteForm(data);
+  } else if (name === "images.json") {
+    container.innerHTML = imagesForm(data);
+  } else {
+    container.innerHTML = listForm(name, data);
+  }
+}
+
+function siteForm(data) {
+  const fields = [
+    ["name", "اسم الموقع"], ["tagline", "الشعار"], ["subtitle", "العنوان الفرعي"],
+    ["description", "الوصف", "textarea"], ["instagram", "رابط إنستغرام"],
+    ["tiktok", "رابط تيك توك"], ["telegram", "رابط تلغرام"],
+    ["courseHub", "رابط منصة الدورات"], ["email", "البريد الإلكتروني"]
+  ];
+  return `<div class="card"><h3>معلومات الموقع</h3>${
+    fields.map(([key, label, type]) =>
+      `<label>${label}</label>${
+        type === "textarea"
+          ? `<textarea id="f_${key}" onchange="siteDoc.${key}=this.value">${escape(data[key]||"")}</textarea>`
+          : `<input id="f_${key}" value="${escape(data[key]||"")}" onchange="siteDoc.${key}=this.value"/>`
+      }`
+    ).join("")
+  }</div>`;
+}
+
+function imagesForm(data) {
+  let html = `<div class="card"><h3>الصور</h3>`;
+  html += `<label>الشعار</label><input id="f_logo" value="${escape(data.logo||"")}" onchange="imagesDoc.logo=this.value"/>`;
+  html += `<label>خلفية قسم التواصل</label><input id="f_contactBg" value="${escape(data.contactBg||"")}" onchange="imagesDoc.contactBg=this.value"/>`;
+  html += `<label>خلفيات الخدمات (روابط)</label>`;
+  (data.serviceBgs||[]).forEach((url, i) => {
+    html += `<div class="flex mb-1"><input value="${escape(url)}" onchange="imagesDoc.serviceBgs[${i}]=this.value"/></div>`;
+  });
+  html += `<label>صور الكاروسيل (روابط)</label>`;
+  (data.carousel||[]).forEach((url, i) => {
+    html += `<div class="flex mb-1"><input value="${escape(url)}" onchange="imagesDoc.carousel[${i}]=this.value"/></div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+
+function listForm(name, data) {
+  const items = Array.isArray(data) ? data : (data.items || []);
+  const titleKey = name === "services.json" ? "title" : "label";
+  const key = name === "services.json" ? "items" : "items";
+  
+  return `<div class="card"><h3>${label(name)}</h3>${
+    items.map((item, i) => `<details style="margin-bottom:.5rem;border:1px solid #1a1a1a;border-radius:8px;padding:.5rem">
+      <summary style="cursor:pointer;color:#dc2626;font-weight:600">${item[titleKey] || item.label || "عنصر "+(i+1)}</summary>
+      ${renderItem(item, name, i)}
+    </details>`).join("")
+  }</div>`;
+}
+
+function renderItem(item, name, idx) {
+  if (name === "services.json") {
+    return `
+      <label>العنوان</label><input value="${escape(item.title||"")}" onchange="servicesDoc.items[${idx}].title=this.value"/>
+      <label>العنوان الفرعي</label><input value="${escape(item.subtitle||"")}" onchange="servicesDoc.items[${idx}].subtitle=this.value"/>
+      <label>المنصات (مفصولة بفاصلة)</label><input value="${escape((item.platforms||[]).join(", "))}" onchange="servicesDoc.items[${idx}].platforms=this.value.split(', ')"/>
+      <label>المميزات (كل ميزة في سطر)</label><textarea onchange="servicesDoc.items[${idx}].features=this.value.split('\\n').filter(Boolean)">${escape((item.features||[]).join("\n"))}</textarea>
+      <label>نص الزر</label><input value="${escape(item.cta||"")}" onchange="servicesDoc.items[${idx}].cta=this.value"/>
+      <label>الرابط (اختياري)</label><input value="${escape(item.link||"")}" onchange="servicesDoc.items[${idx}].link=this.value"/>
+    `;
+  }
+  if (name === "stats.json") {
+    return `
+      <label>النص</label><input value="${escape(item.label||"")}" onchange="statsDoc.items[${idx}].label=this.value"/>
+      <label>القيمة</label><input value="${escape(item.value||"")}" onchange="statsDoc.items[${idx}].value=this.value"/>
+    `;
+  }
+  return "";
+}
+
+// Global refs for each doc
+let siteDoc, servicesDoc, statsDoc, imagesDoc;
+
+function refreshDocs() {
+  siteDoc = fileData["site.json"];
+  servicesDoc = fileData["services.json"];
+  statsDoc = fileData["stats.json"];
+  imagesDoc = fileData["images.json"];
+}
+refreshDocs();
+
+async function saveAll() {
+  refreshDocs();
+  msg("جاري حفظ التعديلات...", "success");
+  
+  for (const [name, path] of Object.entries(FILES)) {
+    const content = btoa(JSON.stringify(fileData[name], null, 2));
+    const sha = shaMap[path];
+    
+    const body = { message: `تحديث ${name} من لوحة التحكم`, content, branch: BRANCH };
+    if (sha) body.sha = sha;
+    
+    const res = await ghFetch(`contents/${encodeURIComponent(path)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    
+    if (!res) return;
+    const result = await res.json();
+    
+    if (res.ok) {
+      shaMap[path] = result.content?.sha;
+    } else {
+      msg(`❌ فشل حفظ ${name}: ${result.message}`, "error");
+      return;
+    }
+  }
+  
+  msg("✅ تم حفظ كل التعديلات! الموقع سيتحدث خلال دقيقة", "success");
+}
+
+function escape(s) { return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+init();
+</script>
 </body>
 </html>
