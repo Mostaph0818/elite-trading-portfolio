@@ -1,15 +1,39 @@
 "use client";
 
-import { useRef, useMemo, Suspense } from "react";
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
+import { useRef, useMemo, Suspense, useState, useEffect } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { IMAGES } from "@/lib/constants";
 
 const RADIUS = 4.5;
 const COUNT = IMAGES.carousel.length;
 
+function createFallbackTexture(index: number) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 300;
+  canvas.height = 225;
+  const ctx = canvas.getContext("2d");
+  if (ctx) {
+    const gradient = ctx.createLinearGradient(0, 0, 300, 225);
+    const colors = ["#0ea5e9", "#10b981", "#8b5cf6", "#f59e0b", "#ef4444", "#ec4899", "#06b6d4", "#84cc16"];
+    gradient.addColorStop(0, colors[index % colors.length]);
+    gradient.addColorStop(1, colors[(index + 3) % colors.length]);
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 300, 225);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 40px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("📊", 150, 112);
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  return tex;
+}
+
 function Card({ url, index }: { url: string; index: number }) {
   const meshRef = useRef<THREE.Mesh>(null);
+  const [texture, setTexture] = useState<THREE.Texture>(() => createFallbackTexture(index));
   const angle = (index / COUNT) * Math.PI * 2;
 
   const pos = useMemo(
@@ -22,7 +46,16 @@ function Card({ url, index }: { url: string; index: number }) {
     [angle, index]
   );
 
-  const texture = useLoader(THREE.TextureLoader, url);
+  useEffect(() => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = url;
+    img.onload = () => {
+      const tex = new THREE.Texture(img);
+      tex.needsUpdate = true;
+      setTexture(tex);
+    };
+  }, [url, index]);
 
   return (
     <mesh ref={meshRef} position={pos} rotation={[0, -angle + Math.PI, 0]}>
